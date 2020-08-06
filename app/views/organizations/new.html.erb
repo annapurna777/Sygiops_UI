@@ -1,0 +1,140 @@
+<!-- {"name"=>"Sygitech", "shared"=>true, "note"=>"sygitech note", "active"=>true, "domain_assignment"=>false, "domain"=>"sygitech.com", "id"=>"c-2"} -->
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title" id="heading">Create Group</h3>
+          </div>
+          <form role="form" action="javascript:void(0);" method="post" id="create_organization">
+            <input id="authenticity_token" name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Organization Name *</label>
+                    <input type="text" name="name" class="form-control" id="name" required>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Shared Organization *</label>
+                    <select class="form-control" id='shared' name="shared">
+                      <option value="true">yes</option>
+                      <option value="false">no</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Domain Based Assignment</label>
+                    <select class="form-control" id='domain_assignment' name="domain_assignment">
+                      <option value="true">yes</option>
+                      <option value="false">no</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">Domain</label>
+                    <input type="text" name="domain" class="form-control" id="domain" required>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">Note</label>
+                    <input type="text" name="note" class="form-control" id="note">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Active *</label>
+                    <select class="form-control" id='active' name="active">
+                      <option value="true">active</option>
+                      <option value="false">inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                  <label for="exampleInputEmail1">Timezone *</label><br>
+                  <select class="form-control" id='timezone_name' name="timezone_name" multiple="multiple" required>
+                    <%@response.each_pair do |timezone , offset|%>
+                    <option value="<%=timezone%>"><%= timezone%> <%if offset > 0%>(GMT+<%=offset%>)<%else%>(GMT<%=offset%>)<%end%></option>
+                    <%end%>
+                  </select>
+                </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_default_heading"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal_default_info">One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$(document).ready(function () {
+
+  $("#timezone_name").select2({
+      maximumSelectionLength: 1,
+      placeholder: "Select a timezone",
+      allowClear: true
+  });
+
+  $('#create_organization').submit(function (event) {
+    $('#cover-spin').show();
+    $.ajax({
+      url: '/organizations',
+      method: 'POST',
+      data: $("#create_organization").serialize(),
+      success: function (s) {
+        $('#cover-spin').hide();
+        if (s.result == "ok") {
+          window.location.href = "/organizations";
+        }
+        else {
+          debugger;
+          document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+          $('#modal-default').modal('show');
+        }
+      },
+      error: function (e) {
+        $('#cover-spin').hide();
+        document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+        $('#modal-default').modal('show');
+      }
+    });
+  });
+});
+
+</script>

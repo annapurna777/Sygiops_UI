@@ -1,0 +1,215 @@
+<!-- <img src="http://localhost:4042/ticket_attachment/30/39/43?disposition=attachment" width="400" height="400"> -->
+
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Ticket# <%= @response["ticket"]["number"] %></h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active">Tickets</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="timeline" id="timeline">
+          <% @response["article"].each do |article| %>
+          <% if article["preferences"]["type"] == "reply" %>
+          <div class="time-label">
+            <span class="bg-red"><%=DateTime.parse(article["created_at"]).strftime('%d %h %Y')%></span>
+          </div>
+          <div>
+            <i class="fa fa-envelope bg-blue"></i>
+            <div class="timeline-item">
+              <span class="time"><i class="fa fa-clock-o"></i> <%=DateTime.parse(article["created_at"]).strftime('%H:%M %p')%></span>
+              <h3 class="timeline-header"><a href="#"><%= @response["user"]["firstname"]+" "+@response["user"]["lastname"] %></a> Created <%= time_ago_in_words(article["created_at"]) %> ago</h3>
+              <div class="timeline-body">
+                <p class="email-subject"><%= article["title"] %></p>
+                <hr>
+                <span class="email_content"><%= article["body"] %></span>
+              </div>
+            </div>
+          </div>
+          <%else%>
+          <div class="time-label">
+            <span class="bg-red"><%=DateTime.parse(@response["ticket"]["created_at"]).strftime('%d %h %Y')%></span>
+          </div>
+          <div>
+            <i class="fa fa-envelope bg-blue"></i>
+            <div class="timeline-item">
+              <span class="time"><i class="fa fa-clock-o"></i> <%=DateTime.parse(@response["ticket"]["created_at"]).strftime('%H:%M %p')%></span>
+              <h3 class="timeline-header"><a href="#"><%= @response["user"]["firstname"]+" "+@response["user"]["lastname"] %></a> Created <%= time_ago_in_words(@response["ticket"]["created_at"]) %> ago</h3>
+              <div class="timeline-body">
+                <p class="email-subject"><%= @response["ticket"]["title"] %></p>
+                <hr>
+                <span class="email_content" id="body"><%= article["body"] %></span>
+              </div>
+              <div class="timeline-footer">
+                <a class="btn btn-primary btn-sm reply" id="<%=article["message_id"]%>"><i class="fa fa-reply"></i>Reply</a>
+              </div>
+            </div>
+          </div>
+          <% end %>
+          <div>
+            <% if @attached_files[article["id"].to_s] && @attached_files[article["id"].to_s].count > 0 %>
+            <i class="fa fa-paperclip bg-purple"></i>
+            <div class="timeline-item">
+              <% if @attached_files[article["id"].to_s].count == 1 %>
+              <h3 class="timeline-header">1 ATTACHED FILE</h3>
+              <% elsif @attached_files[article["id"].to_s].count > 1 %>
+              <h3 class="timeline-header"><%= @attached_files[article["id"].to_s].count %> ATTACHED FILES</h3>
+              <%end%>
+              <div class="timeline-body">
+                <div class="row">
+                  <%@attached_files[article["id"].to_s].each do |attachment|%>
+                  <div class="col-md-2">
+                    <%if attachment["preferences"]["Content-Type"].match("image/")%>
+                    <img class="download ticket-attachment" src="<%= attachment["url"]%>">
+                    <%elsif attachment["preferences"]["Content-Type"].match("pdf")%>
+                    <a href="<%= attachment["url"]%>"><i class="fa fa-file-pdf-o fa-5x img-sm ticket-attachment"></i></a>
+                    <%else %>
+                    <a href="<%= attachment["url"]%>"><i class="fa fa-file fa-5x img-sm ticket-attachment"></i></a>
+                    <%end%>
+                    <br>
+                    <span style="overflow-wrap: break-word;"><%= attachment["filename"]%></span><br>
+                    <span style="overflow-wrap: break-word;"><%= Filesize.from(attachment["size"]).pretty %></span>
+                  </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+            <%end%>
+          </div>
+          <% end %>
+          <div class="d-none" id="reply_email_content">
+            <i class="fa fa-reply bg-blue"></i>
+            <div class="timeline-item">
+              <div class="timeline-body">
+                <form role="form" enctype = "multipart/form-data" action="/tickets/send_reply" method="post" id="reply_mail_form">
+                  <input id="authenticity_token" name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+                  <input id="ticket_id" name="ticket_id" value="<%=@response["ticket"]["id"]%>" type="hidden">
+                  <input id="message_id" name="message_id" value="" type="hidden">
+                  <div class="card-body" style="padding: 0rem !important;">
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">TO</label>
+                      <select id='to' name=to[] multiple="multiple">
+                        <% @users.each do |user| %>
+                        <option value="<%= user[3] %>"><%= user[1]+user[2]+" <"+user[0]+">" %></option>
+                        <% end %>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>CC</label>
+                      <select id='cc' name=cc[] multiple="multiple">
+                        <% @users.each do |user| %>
+                        <option value="<%= user[3] %>"><%= user[1]+user[2]+" <"+user[0]+">" %></option>
+                        <% end %>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputFile">File input</label>
+                      <div class="input-group">
+                        <div class="custom-file">
+                          <input type="file" name=attachments[] class="custom-file-input" id = "attachments" multiple onChange="javascript:updateList();">
+                          <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                        </div>
+                      </div>
+                      <p>Selected files:</p>
+                      <div id="fileList"></div>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Content</label>
+                      <textarea name="email_body"></textarea>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Send</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal fade" id="show-image">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img class="img-sm ticket-attachment-image" id="modal-image-show" src="">
+      </div>
+      <div class="modal-footer justify-content-between">
+        <a href="#" class="btn btn-primary" id="download_button">Download</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_default_heading"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal_default_info">One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+$(document).ready(function () {
+  CKEDITOR.replace( 'email_body' );
+  var email_content = document.getElementsByClassName("email_content");
+  for (var i = 0 ; i < email_content.length ; i++){
+    email_content[i].innerHTML = email_content[i].textContent;
+  }
+  var files = [];
+  $('select').select2({ width: '100%', placeholder: "Select an Option", allowClear: true });
+  $('.download').click(function() {
+    var src = $(this).attr('src');
+    $("#download_button").attr('href',src)
+    $("#modal-image-show").attr('src',src)
+    $('#show-image').modal('show');
+  });
+
+  $('.reply').click(function() {
+    $("#reply_email_content").removeClass("d-none");
+    $("#message_id").val(this.id);
+  });
+
+  updateList = function() {
+    var input = document.getElementById('attachments');
+    var output = document.getElementById('fileList');
+    var children = "";
+    for (var i = 0; i < input.files.length; ++i) {
+      children += '<li>' + input.files.item(i).name + '</li>';
+    }
+    output.innerHTML = '<ul>'+children+'</ul>';
+  }
+
+});
+
+function image_modal(){
+}
+</script>

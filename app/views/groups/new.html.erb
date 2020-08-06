@@ -1,0 +1,167 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title" id="heading">Create Group</h3>
+          </div>
+          <form role="form" action="javascript:void(0);" method="post" id="create_group">
+            <input id="authenticity_token" name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Group Name *</label>
+                    <input type="text" name="name" class="form-control" id="name" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Assignment Timeout</label>
+                    <input type="number" name="assignment_timeout" class="form-control" id="assignment_timeout">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Follow Up Possible</label>
+                    <select class="form-control" id='follow_up_possible' name="follow_up_possible">
+                      <option value="new_ticket">do not reopen Ticket but create new Ticket</option>
+                      <option value="yes">yes</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Assign Follow-Ups</label>
+                    <select class="form-control" id='follow_up_assignment' name="follow_up_assignment">
+                      <option value="true">yes</option>
+                      <option value="false">no</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Email</label>
+                    <select class="form-control" id='email_address_id' name="email_address_id">
+                      <% @response["emails"].each do |email| %>
+                      <option value="<%= email["id"]%>"><%= email["realname"]+ " <"+email["email"]+">"%></option>
+                      <%end%>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Signature</label>
+                    <select class="form-control" id='signature_id' name="signature_id">
+                      <% @response["signatures"].each do |signature| %>
+                      <option value="<%= signature["id"]%>"><%= signature["name"]%></option>
+                      <%end%>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">Note</label>
+                    <input type="text" name="note" class="form-control" id="note">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Active *</label>
+                    <select class="form-control" id='active' name="active">
+                      <option value="true">active</option>
+                      <option value="false">inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_default_heading"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal_default_info">One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function () {
+
+  $('#create_group').submit(function (event) {
+    $('#cover-spin').show();
+    $.ajax({
+      url: '/groups',
+      method: 'POST',
+      data: $("#create_group").serialize(),
+      success: function (s) {
+        $('#cover-spin').hide();
+        if (s.result == "ok") {
+          window.location.href = "/groups";
+        }
+        else {
+          document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+          $('#modal-default').modal('show');
+        }
+      },
+      error: function (e) {
+        $('#cover-spin').hide();
+        document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+        $('#modal-default').modal('show');
+      }
+    });
+  });
+
+  // $('#edit_group').submit(function (event) {
+  //   $('#cover-spin').show();
+  //   $.ajax({
+  //     url: '/ticket_priority/<%=@id%>',
+  //     method: 'PATCH',
+  //     data: $("#edit_group").serialize(),
+  //     success: function (s) {
+  //       $('#cover-spin').hide();
+  //       if (s.result == "ok") {
+  //         window.location.href = "/ticket_priority";
+  //       }
+  //        else {
+  //          document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+  //          $('#modal-default').modal('show');
+  //       }
+  //     },
+  //     error: function (e) {
+  //       $('#cover-spin').hide();
+  //       document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+  //       $('#modal-default').modal('show');
+  //     }
+  //   });
+  // });
+
+});
+
+</script>

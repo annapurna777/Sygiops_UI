@@ -1,0 +1,47 @@
+<% @response.each_pair do |category,options| %>
+<%if category == "none"%>
+<label>All Tickets</label>
+<%elsif !options.blank?%>
+<label><%= category %></label>
+<%end%>
+<%if !options.blank?%>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th style="width: 10px">Ticket No.</th>
+      <th>Title</th>
+      <th>Customer</th>
+      <th>Created at</th>
+      <th>Priority</th>
+      <th style="width: 40px">State</th>
+      <th style="width: 40px">View Ticket</th>
+    </tr>
+  </thead>
+  <tbody>
+    <div id="tickets">
+      <%options.each do |ticket|%>
+      <tr>
+        <td><%=ticket["number"]%></td>
+        <td><%=ticket["title"]%></td>
+        <td><%=ticket["customer"]%></td>
+        <td><%=DateTime.parse(ticket["created_at"]).strftime('%m/%d/%Y , %H:%M:%S %p')%>  (Created <%= time_ago_in_words(DateTime.parse(ticket["created_at"])) %> ago)</td>
+        <td>
+          <%if ticket["priority"] == "1 low"%>
+          <span class="badge bg-warning">low</span>
+          <%elsif ticket["priority"] == "2 normal"%>
+          <span class="badge bg-primary">normal</span>
+          <%elsif ticket["priority"] == "3 high"%>
+          <span class="badge bg-danger">high</span>
+          <%else%>
+          <span class="badge bg-primary"><%= ticket["priority"]%></span>
+          <%end%>
+        </td>
+        <td><span class="badge bg-danger"><%= ticket["state"]%></span></td>
+          <td><a href="/tickets/<%= ticket["id"] %>"><span class="float-right text-sm text-primary"><i class="fa fa-eye"></i></span></a></td>
+        </tr>
+        <%end%>
+      </div>
+    </tbody>
+  </table>
+  <%end%>
+  <%end%>

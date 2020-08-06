@@ -1,0 +1,368 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Active Channels</h3>
+            <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#myModalInbound">Create New Channel</button>
+          </div>
+          <div class="card-body">
+            <%if @response["active_channels"].count > 0%>
+            <%@response["active_channels"].each do |active|%>
+            <div class="row">
+              <div class="col-md-6">
+                <label>INBOUND</label><br>
+                Type:   Email<br>
+                Host:   <%=active["options"]["inbound"]["options"]["host"]%><br>
+                User:   <%=active["options"]["inbound"]["options"]["user"]%><br>
+                Port:   <%=active["options"]["inbound"]["options"]["port"]%><br>
+              </div>
+              <span class="vl-active"></span>
+              <div class="col-md-6">
+                <label>OUTBOUND</label><br>
+                Type:   Email<br>
+                Host:   <%=active["options"]["outbound"]["options"]["host"]%><br>
+                User:   <%=active["options"]["outbound"]["options"]["user"]%><br>
+                Port:   <%=active["options"]["outbound"]["options"]["port"]%><br>
+              </div>
+            </div>
+            <br>
+            <button type="button" class="btn btn-danger">Disable</button>
+            <hr style="width:100%;text-align:left;margin-left:0">
+            <% end %>
+            <%else%>
+            No Active Channels
+            <%end%>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+</section>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Inactive Channels</h3>
+          </div>
+          <div class="card-body">
+            <%if @response["inactive_channels"].count > 0%>
+            <%@response["inactive_channels"].each do |inactive|%>
+            <div class="row">
+              <div class="col-md-6">
+                <label>INBOUND</label><br>
+                Type: Email<br>
+                Host: <%=inactive["options"]["inbound"]["options"]["host"]%><br>
+                User: <%=inactive["options"]["inbound"]["options"]["user"]%><br>
+                Port: <%=inactive["options"]["inbound"]["options"]["port"]%><br>
+              </div>
+              <div class="vl-inactive"></div>
+              <div class="col-md-6">
+                <label>OUTBOUND</label><br>
+                Type: Email<br>
+                Host: <%=inactive["options"]["outbound"]["options"]["host"]%><br>
+                User: <%=inactive["options"]["outbound"]["options"]["user"]%><br>
+                Port: <%=inactive["options"]["outbound"]["options"]["port"]%><br>
+              </div>
+            </div>
+            <br>
+            <button type="button" class="btn btn-success">Enable</button>
+            <hr style="width:100%;text-align:left;margin-left:0">
+            <% end %>
+            <%else%>
+            No Inactive channels
+            <%end%>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="myModalInbound" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <section class="content">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">Inbound Configuration</h3>
+                  </div>
+                  <form role="form" action="javascript:void(0)" id="email_inbound_configuration">
+                    <input id="authenticity_token_inbound" name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+                    <input id="probe_type_inbound" name="probe_type" value="inbound" type="hidden">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label>ORGANIZATION NAME *</label>
+                        <input type="text" name="realname" class="form-control input-lg" id="realname_inbound"
+                        placeholder="Organization name" required />
+                      </div>
+                      <div class="form-group">
+                        <label>TYPE *</label>
+                        <select name="adapter" id="adapter_inbound" class="form-control" required>
+                          <option value="imap">Imap</option>
+                          <option value="pop3">Pop3</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>HOST *</label>
+                        <input type="text" name=[options][host] class="form-control input-lg" id="options_host_inbound"
+                        placeholder="Host" value="imap.gmail.com" required />
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">USER *</label>
+                        <input type="email" class="form-control" name=[options][user] id="options_user_inbound" placeholder="your support email" required>
+                      </div>
+                      <div class="form-group">
+                        <label>PASSWORD *</label>
+                        <input type="password" class="form-control" name=[options][password] id="options_password_inbound"
+                        placeholder="Password *" required />
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label>SSL/STARTTLS *</label>
+                            <select name=[options][ssl] id="options_ssl_inbound" class="form-control" required>
+                              <option value="yes">yes</option>
+                              <option value="no">no</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label>PORT *</label>
+                            <input type="text" class="form-control input-lg" name=[options][port] id="options_port_inbound"
+                            placeholder="port *" value="993" required />
+                            <div class="validate"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label>FOLDER </label>
+                            <input type="text" class="form-control input-lg" name=[options][folder] id="options_folder_inbound"
+                            placeholder="folder" value="INBOX" disabled required />
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label>KEEP ON SERVER *</label>
+                            <select name=[options][keep_on_server] id="options_keep_on_server_inbound" class="form-control" required>
+                              <option value="no">no</option>
+                              <option value="yes">yes</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="myModalOutbound" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+      <div class="modal-body">
+        <section class="content">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">Inbound Settings Configuration Successful , Please Enter Outbound Configuration</h3>
+                  </div>
+                  <form role="form" action="javascript:void(0)" id="email_outbound_configuration">
+                    <input id="authenticity_token_outbound" name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+                    <input id="probe_type_outbound" name="probe_type" value="outbound" type="hidden">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label>TYPE *</label>
+                        <select name="adapter" id="adapter_outbound" class="form-control" required>
+                          <option value="smtp">SMTP-configure your own smtp settings</option>
+                          <option value="sendmail">Sendmail</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>HOST *</label>
+                        <input type="text" name=[options][host] class="form-control input-lg" id="options_host_outbound"
+                        placeholder="Host" value="smtp.gmail.com" required />
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">USER *</label>
+                        <input type="email" class="form-control" name=[options][user] id="options_user_outbound" placeholder="your support email" required>
+                      </div>
+                      <div class="form-group">
+                        <label>PASSWORD *</label>
+                        <input type="password" class="form-control" name=[options][password] id="options_password_outbound"
+                        placeholder="Password *" required />
+                      </div>
+                      <div class="form-group">
+                        <label>PORT *</label>
+                        <input type="text" class="form-control input-lg" name=[options][port] id="options_port_outbound"
+                        placeholder="port *" value="25" required />
+                        <div class="validate"></div>
+                      </div>
+                      <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_default_heading"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal_default_info">One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- {"inbound"=>{"adapter"=>"imap", "options"=>{"host"=>"imap.gmail.com", "port"=>993, "ssl"=>true, "user"=>"annapurna.tiwari1998@gmail.com", "password"=>"[FILTERED]"}}, "outbound"=>{"adapter"=>"smtp", "options"=>{"host"=>"smtp.gmail.com", "port"=>25, "start_tls"=>true, "user"=>"annapurna.tiwari1998@gmail.com", "password"=>"[FILTERED]", "domain"=>"gmail.com", "enable_starttls_auto"=>true, "openssl_verify_mode"=>"none"}}, "meta"=>{"realname"=>"Sales", "email"=>"annapurna.tiwari1998@gmail.com", "password"=>"[FILTERED]", "group_id"=>"1"}, "domain"=>"gmail|googlemail|google", "group_id"=>"1"} -->
+<script>
+$(document).ready(function () {
+  var full_data = new Object;
+  $('#email_inbound_configuration').submit(function (event) {
+    $('#cover-spin').show();
+    $.ajax({
+      url: '/channel_emails',
+      method: 'POST',
+      data: $("#email_inbound_configuration").serialize(),
+      success: function (s) {
+        $('#cover-spin').hide();
+        $('#myModalInbound').modal('hide');
+        if (s.result == "ok") {
+          full_data["inbound"] = objectifyForm($("#email_inbound_configuration").serializeArray());
+          full_data["inbound"]["adapter"] = $("#adapter_inbound").val();
+          full_data["email"] = full_data["inbound"]["options"]["user"];
+          full_data["group_id"] = 1;
+          $("#options_user_outbound").val($("#options_user_inbound").val());
+          $("#options_password_outbound").val($("#options_password_inbound").val());
+          $('#myModalOutbound').modal('show');
+        }
+        else if (s.result == "duplicate") {
+          document.getElementById("modal_default_info").innerHTML = "Account already exists";
+          $('#modal-default').modal('show');
+
+        } else {
+          document.getElementById("modal_default_info").innerHTML = "Inbound settings configuration failed!";
+          $('#modal-default').modal('show');
+        }
+      },
+      error: function (e) {
+        $('#cover-spin').hide();
+        document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+        $('#modal-default').modal('show');
+      }
+    });
+  });
+
+  $('#email_outbound_configuration').submit(function (event) {
+    $('#cover-spin').show();
+    $.ajax({
+      url: '/channel_emails',
+      method: 'POST',
+      data: $("#email_outbound_configuration").serialize(),
+      success: function (s) {
+        // $('#cover-spin').hide();
+        if (s.result == "ok") {
+          full_data["outbound"] = objectifyForm($("#email_outbound_configuration").serializeArray());
+          full_data["outbound"]["adapter"] = $("#adapter_outbound").val();
+          full_data["authenticity_token"] = "<%= form_authenticity_token %>";
+          $('#myModalOutbound').modal('hide');
+          $.ajax({
+            url: '/channel_emails',
+            method: 'POST',
+            data: full_data,
+            success: function (s) {
+              $('#cover-spin').hide();
+              location.reload();
+              document.getElementById("modal_default_info").innerHTML = "Inbound and Outbound Setting configuration successful";
+              $('#modal-default').modal('show');
+            },
+            error: function (e) {
+              $('#cover-spin').hide();
+              document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+              $('#modal-default').modal('show');
+            }
+          });
+
+        }
+        else if (s.result == "duplicate") {
+          $('#cover-spin').hide();
+          document.getElementById("modal_default_info").innerHTML = "Account already exists";
+          $('#modal-default').modal('show');
+
+        } else {
+          $('#cover-spin').hide();
+          document.getElementById("modal_default_info").innerHTML = "Outbound settings configuration failed!";
+          $('#modal-default').modal('show');
+
+        }
+      },
+      error: function (e) {
+        $('#cover-spin').hide();
+        document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+        $('#modal-default').modal('show');
+      }
+    });
+  });
+
+});
+
+function objectifyForm(formArray) {
+  var regex = /\[\s*(.*?)\s*\]/g;
+  var returnArray = {};
+  returnArray["options"] = {};
+  for (var i = 0; i < formArray.length; i++){
+    var matches = [];
+    while (m = regex.exec(formArray[i]['name'])) {
+      matches.push(m[1]);
+    }
+    if(matches.length == 2){
+      returnArray["options"][matches[1]] = formArray[i]['value'];
+    } else {
+      returnArray[formArray[i]['name']] = formArray[i]['value'];
+    }
+  }
+  return returnArray;
+}
+
+</script>

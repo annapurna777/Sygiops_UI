@@ -1,0 +1,88 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Group</h3>
+            <a href="/groups/new" class="btn btn-primary float-right">Create New</a>
+          </div>
+          <div class="card-body">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Note</th>
+                  <th>Created at</th>
+                  <th>Active Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div id="group">
+                <% @response.each do |group| %>
+                <tr>
+                  <td><%=group["name"]%></td>
+                  <td><%=group["note"]%></td>
+                  <td><%=DateTime.parse(group["created_at"]).strftime('%m/%d/%Y , %H:%M:%S %p')%>  (Created <%= time_ago_in_words(DateTime.parse(group["created_at"])) %> ago)</td>
+                  <td><%if group["active"] == true%><i class="fa fa-check"></button></i><%else%><i class="fa fa-ban"></i><%end%></td>
+                  <td><%if group["active"] == true%><button class="btn btn-primary" title="deactivate" id="<%=group["id"]%>" onClick="setActiveStatus(this.id);"><i class="fa fa-ban"></button></i><%else%><button class="btn btn-primary" title="activate" id="<%=group["id"]%>" onClick="setActiveStatus(this.id);"><i class="fa fa-check" title="activate"></i></button><%end%></td>
+                </tr>
+                <% end %>
+              </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_default_heading"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal_default_info">One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function () {
+
+});
+
+function setActiveStatus(id){
+  $('#cover-spin').show();
+  $.ajax({
+     url: '/groups/'+id,
+     method: 'PATCH',
+     data: {authenticity_token: "<%= form_authenticity_token %>"},
+     success: function (s) {
+       $('#cover-spin').hide();
+       if (s.result == "ok") {
+         window.location.href = "/groups";
+       }else {
+          document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+          $('#modal-default').modal('show');
+       }
+     },
+     error: function (e) {
+       $('#cover-spin').hide();
+       document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+       $('#modal-default').modal('show');
+     }
+   });
+}
+
+</script>

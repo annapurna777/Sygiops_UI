@@ -1,0 +1,118 @@
+<%#binding.pry%>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-md-5">
+                <h3 class="card-title">Tickets</h3>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <select class="form-control" id='category' name="category" placeholder="Group tickets by">
+                    <option value="none">Select Category</option>
+                    <option value="organization">Organization</option>
+                    <option value="customer">Customer</option>
+                    <option value="state">State</option>
+                    <option value="type">Ticket Type</option>
+                    <option value="created_at">Created At</option>
+                    <option value="priority">Priority</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3" id="options_div">
+                <select class="form-control" id='options' name="options" placeholder="Group tickets by">
+                </select>
+              </div>
+              <div class="col-md-1" >
+                <button type="submit" class="btn btn-primary float-right" onclick="getFilteredTickets();">Filter</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="filtered_tickets">
+              <%= render "partials/tickets_index" %>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- </div> -->
+
+  <script>
+  $(document).ready(function () {
+    var url = "/tickets"
+    var x = "" ;
+    var data = {parameter: "none"}
+    var selector;
+    $('#category').change(function(event){
+      x = '<option value="none">All</option>';
+      data["parameter"] = $(this).val();
+      if (data["parameter"] == "created_at"){
+        document.getElementById("options_div").innerHTML = '<input type="date" class="form-control" id="options" name="options">';
+      }else if (data["parameter"] == "none"){
+      }else{
+        $.ajax({
+          url: "/tickets/get_options",
+          method: 'GET',
+          data: data,
+          success: function (s) {
+            $('#cover-spin').hide();
+            if (data["parameter"] == "customer"){
+              for (index = 0; index < s.length; index++) {
+                x+= '<option value="'+`${s[index].id}`+'">'+`${s[index].firstname} ${s[index].lastname}`+'</option>'
+              }
+            }else{
+              for (index = 0; index < s.length; index++) {
+                x+= '<option value="'+`${s[index].id}`+'">'+`${s[index].name}`+'</option>'
+              }
+            }
+            document.getElementById("options_div").innerHTML = '<select class="form-control" id="options" name="options" placeholder="Group tickets by">'+
+            x+
+            '</select>';
+          },
+          error: function (e) {
+            $('#cover-spin').hide();
+            document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+            $('#modal-default').modal('show');
+          }
+        });
+      }
+
+    });
+
+  });
+
+  function getFilteredTickets(){
+    var category = $("#category").val();
+    var option = $("#options").val();
+    if ($("#options").val() == ""){
+      option = "none"
+    }
+    if ($("#category").val() == "none"){
+      alert("Please select category to filter tickets!")
+    }else{
+    $('#cover-spin').show();
+    $.ajax({
+      url: '/tickets',
+      method: 'GET',
+      data: {category: category,option: option, filter: true},
+      success: function (s) {
+        $('#cover-spin').hide();
+        $("#filtered_tickets").html(s);
+      },
+      error: function (e) {
+        $('#cover-spin').hide();
+        document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+        $('#modal-default').modal('show');
+      }
+    });
+  }
+  }
+
+</script>

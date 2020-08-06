@@ -1,0 +1,90 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Tickets</h3>
+            <a href="/ticket_types/new" class="btn btn-primary float-right">Create New</a>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Note</th>
+                  <th>Created at</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div id="types">
+                <% @response.each do |type| %>
+                <tr>
+                  <td><%=type["name"]%></td>
+                  <td><%=type["note"]%></td>
+                  <td><%=DateTime.parse(type["created_at"]).strftime('%m/%d/%Y , %H:%M:%S %p')%>  (Created <%= time_ago_in_words(DateTime.parse(type["created_at"])) %> ago)</td>
+                  <td><a href="ticket_types/<%= type["id"]%>/edit?name=<%=type["name"]%>&note=<%=type["note"]%>" data-method="get"><span ><i class="fa fa-edit" id="<%= type["id"]%>"></i></span></a>
+                  <a href="javascript:void(0)"><span class="float-right text-sm text-primary"><i class="fa fa-trash" onClick="deleteType(<%= type["id"]%>);" id="<%= type["id"]%>"></i></span></a></td>
+                </tr>
+                <% end %>
+              </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_default_heading"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal_default_info">One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function () {
+
+});
+
+function deleteType(id) {
+  $('#cover-spin').show();
+  $.ajax({
+        url: '/ticket_types/'+id,
+        method: 'DELETE',
+        data: {authenticity_token: "<%= form_authenticity_token %>"},
+        success: function (s) {
+          $('#cover-spin').hide();
+          if (s.result == "ok") {
+            window.location.href = "/ticket_types";
+          }
+           else {
+             document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+             $('#modal-default').modal('show');
+          }
+        },
+        error: function (e) {
+          // debugger;
+          $('#cover-spin').hide();
+          document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+          $('#modal-default').modal('show');
+        }
+      });
+}
+
+</script>

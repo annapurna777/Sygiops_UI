@@ -1,0 +1,250 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Calendar</h3>
+          </div>
+          <div class="card-body">
+            <form role="form" action="javascript:void(0)" id="create_new_calendar">
+              <input id="authenticity_token_outbound" name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+              <div class="form-group">
+                <label for="exampleInputEmail1">NAME *</label>
+                <input type="text" class="form-control" name="name" id="calendar_name" required>
+              </div>
+              <label for="exampleInputEmail1">BUSINESS HOURS*</label>
+              <table class="table table-bordered" id="days_table">
+                <thead>
+                  <tr>
+                    <th>MONDAY<input type="checkbox" class="float-right active_checkbox" id="mon_checkbox" name="mon_checkbox" value="active" checked="checked"></th>
+                    <th>TUESDAY<input type="checkbox" class="float-right active_checkbox" id="tue_checkbox" name="tue_checkbox" value="active" checked="checked"></th>
+                    <th>WEDNESDAY<input type="checkbox" class="float-right active_checkbox" id="wed_checkbox" name="wed_checkbox" value="active" checked="checked"></th>
+                    <th>THURSDAY<input type="checkbox" class="float-right active_checkbox" id="thu_checkbox" name="thu_checkbox" value="active" checked="checked"></th>
+                    <th>FRIDAY<input type="checkbox" class="float-right active_checkbox" id="fri_checkbox" name="fri_checkbox" value="active" checked="checked"></th>
+                    <th>SATURDAY<input type="checkbox" class="float-right active_checkbox" id="sat_checkbox" name="sat_checkbox" value="inactive"></th>
+                    <th>SUNDAY<input type="checkbox" class="float-right active_checkbox" id="sun_checkbox" name="sun_checkbox" value="inactive"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="tr_1">
+                    <%@days.each do |day|%>
+                    <%#if day == "sat" || day == "sun" %>
+                    <!-- <td id="<%=day%>_td_1" class="<%=day%>_check fade-element"> -->
+                    <%#else%>
+                    <td id="<%=day%>_td_1" class="<%=day%>_check">
+                    <%#end%>
+                      <div class="form-group">
+                        <label>FROM</label>
+                        <input type="time" class="form-control" name=[<%=day%>][from_1] value="09:00">
+                      </div>
+                      <div class="form-group">
+                        <label>TILL</label>
+                        <input type="time" class="form-control" name=[<%=day%>][till_1] value="18:00">
+                      </div>
+                    </td>
+                    <%end%>
+                  </tr>
+                  <tr>
+                    <%@days.each do |day|%>
+                    <%#if day == "sat" || day == "sun" %>
+                    <!-- <td><button type="button" class="btn btn-primary float-left add_td d-none" id="<%=day%>_plus_2" onClick="addRow(this.id);"><span ><i class="fa fa-plus"></i></span></button>
+                      <button type="button" class="btn btn-primary float-right d-none remove_td" id="<%=day%>_minus_1" onClick="deleteRow(this.id)"><span ><i class="fa fa-minus" ></i></span></button></td> -->
+                    <%#else%>
+                      <td><button type="button" class="btn btn-primary float-left add_td" id="<%=day%>_plus_2" onClick="addRow(this.id);"><span ><i class="fa fa-plus"></i></span></button>
+                        <button type="button" class="btn btn-primary float-right d-none remove_td" id="<%=day%>_minus_1" onClick="deleteRow(this.id)"><span ><i class="fa fa-minus" ></i></span></button></td>
+                    <%#end%>
+                      <%end%>
+                    </tr>
+                  </tbody>
+                </table>
+                <label for="exampleInputEmail1">HOLIDAYS</label>
+                <div id="holidays">
+                  <div class="row" id="div_public_holiday_1">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">DATE</label>
+                        <input type="date" class="form-control" name=[public_holiday_1] id="public_holiday_1">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">SUMMARY</label>
+                        <input type="text" class="form-control" name=[summary_1] id="public_holiday_summary_1">
+                      </div>
+                    </div>
+                    <div class="col-md-2">
+                      <div class="form-group">
+                        <label>REMOVE</label><br>
+                        <button type="button" class="btn btn-primary remove_holiday" id="remove_holiday_1" onClick="deleteHoliday(this.id)"><span ><i class="fa fa-trash" ></i></span></button>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <button type="button" class="btn btn-primary float-left" onClick="addHoliday();"><span ><i class="fa fa-plus" ></i></span>Add Holiday</button>
+                </div>
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary float-right">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal_default_heading"></h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p id="modal_default_info">One fine body&hellip;</p>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  var added_holidays = 1;
+  $(document).ready(function() {
+    $('#create_new_calendar').submit(function (event) {
+      $('#cover-spin').show();
+      $.ajax({
+        url: '/calendars',
+        method: 'POST',
+        data: $("#create_new_calendar").serialize(),
+        success: function (s) {
+          $('#cover-spin').hide();
+          if (s.result == "ok") {
+            window.location.href = "/calendars"
+          }else {
+            document.getElementById("modal_default_info").innerHTML = "Inbound settings configuration failed!";
+            $('#modal-default').modal('show');
+          }
+        },
+        error: function (e) {
+          $('#cover-spin').hide();
+          document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+          $('#modal-default').modal('show');
+        }
+      });
+    });
+    $(".active_checkbox").change(function() {
+      var id = this.id;
+      var day = id.split("_")[0];
+      if(this.value == "inactive"){
+        this.value = "active";
+        $(`.${day}_check`).each(function(i, obj) {
+          $(`#${obj.id}`).removeClass("fade-element");
+        });
+      }else{
+        this.value = "inactive";
+        $(`.${day}_check`).each(function(i, obj) {
+          $(`#${obj.id}`).addClass("fade-element");
+        });
+      }
+    });
+  });
+
+  function deleteRow(id)
+  {
+    var day = id.split("_")[0];
+    var count =  id.split("_")[2];
+    document.getElementById(`${day}_td_${count}`).innerHTML = "";
+    $(`#${day}_minus_${count}`).attr("id",`${day}_minus_${parseInt(count)-1}`);
+    $(`#${day}_plus_${count}`).attr("id",`${day}_plus_${parseInt(count)-1}`);
+    if((parseInt(count)-1) == 1){
+      $(`#${day}_minus_${parseInt(count)-1}`).toggleClass("d-none");
+    }
+  }
+
+
+  function addRow(id) {
+    var day = id.split("_")[0];
+    var count =  id.split("_")[2];
+    var tr = `#tr_${count}`;
+    var x=document.getElementById('days_table');
+    var len = x.rows.length;
+    var td_data = '<div class="form-group">'+
+    '<label>FROM</label>'+
+    '<input type="time" class="form-control" name=['+`${day}`+'][from_'+`${count}`+'] value="09:00">'+
+    '</div>'+
+    '<div class="form-group">'+
+    '  <label>TILL</label>'+
+    '<input type="time" class="form-control" name=['+`${day}`+'][till_'+`${count}`+'] value="18:00">'+
+    '</div>';
+    if(document.getElementById(`${day}_td_${count}`) == null) {
+      var new_row = '<tr id="tr_'+`${count}`+'">'+
+      '<td id="mon_td_'+`${count}`+'" class="mon_check">'+'</td>'+
+      '<td id="tue_td_'+`${count}`+'" class="tue_check">'+'</td>'+
+      '<td id="wed_td_'+`${count}`+'" class="wed_check">'+'</td>'+
+      '<td id="thu_td_'+`${count}`+'" class="thu_check">'+'</td>'+
+      '<td id="fri_td_'+`${count}`+'" class="fri_check">'+'</td>'+
+      '<td id="sat_td_'+`${count}`+'" class="sat_check">'+'</td>'+
+      '<td id="sun_td_'+`${count}`+'" class="sun_check">'+'</td>'+
+      '</tr>';
+      $('#days_table > tbody > tr').eq(len-3).after(new_row);
+      $(`#${day}_td_${count}`).append(td_data);
+      $(`#${day}_minus_${parseInt(count)-1}`).toggleClass("d-none");
+      $(`#${day}_plus_${count}`).attr("id",`${day}_plus_${parseInt(count)+1}`);
+      $(`#${day}_minus_${parseInt(count)-1}`).attr("id",`${day}_minus_${count}`);
+    }else{
+      $(`#${day}_td_${count}`).append(td_data);
+      $(`#${day}_minus_${parseInt(count)-1}`).toggleClass("d-none");
+      $(`#${day}_plus_${count}`).attr("id",`${day}_plus_${parseInt(count)+1}`);
+      $(`#${day}_minus_${parseInt(count)-1}`).attr("id",`${day}_minus_${count}`);
+    }
+  }
+
+  function addHoliday() {
+    var holiday_data = '<div class="row" id="div_public_holiday_'+`${parseInt(added_holidays)+1}`+'">'+
+    '<div class="col-md-3">'+
+    '<div class="form-group">'+
+    '<label for="exampleInputEmail1">DATE</label>'+
+    '<input type="date" class="form-control" name=[public_holiday_'+`${parseInt(added_holidays)+1}`+'] id="public_holiday_'+`${parseInt(added_holidays)+1}`+'">'+
+    '</div>'+
+    '</div>'+
+    '<div class="col-md-3">'+
+    '<div class="form-group">'+
+    '<label for="exampleInputEmail1">SUMMARY</label>'+
+    '<input type="text" class="form-control" name=[summary_'+`${parseInt(added_holidays)+1}`+'] id="public_holiday_summary_'+`${parseInt(added_holidays)+1}`+'">'+
+    '</div>'+
+    '</div>'+
+    '<div class="col-md-2">'+
+    '<div class="form-group">'+
+    '<label>REMOVE</label>'+
+    '<br>'+
+    '<button type="button" class="btn btn-primary remove_holiday" id="remove_holiday_'+`${parseInt(added_holidays)+1}`+'" onClick="deleteHoliday(this.id)"><span ><i class="fa fa-trash" ></i></span></button>'+
+    '</div>'+
+    '</div>'+
+    '<div class="col-md-4">'+
+    '</div>'+
+    '</div>';
+    
+    $("#holidays").append(holiday_data);
+    added_holidays = added_holidays+1;
+  }
+
+  function deleteHoliday(id) {
+    $(`#div_public_holiday_${id.split("_")[2]}`).remove();
+  }
+
+  function manageName(id) {
+    var date = $(`#${id}`).val();
+    $(`#${id}`).attr("name",`[public_holidays][${date}]`);
+    // $(`#public_holiday_summary_${id.split("_")[2]}`).attr("name",`[public_holidays][${date}][summary]`);
+
+  }
+
+</script>

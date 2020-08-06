@@ -1,0 +1,50 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card card-primary">
+        <form role="form" enctype = "multipart/form-data" action="/tickets/send_reply" method="post" id="reply_mail_form">
+          <input id="authenticity_token" name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+          <input id="ticket_id" name="ticket_id" value="<%=@response["ticket"]["id"]%>" type="hidden">
+          <div class="card-body" style="padding: 4rem !important;">
+            <div class="form-group">
+              <label for="exampleInputEmail1">TO</label>
+              <select id='to' name=to[] multiple="multiple">
+                <% @users.each do |user| %>
+                <option value="<%= user[3] %>"><%= user[1]+user[2]+" <"+user[0]+">" %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>CC</label>
+              <select id='cc' name=cc[] multiple="multiple">
+                <% @users.each do |user| %>
+                <option value="<%= user[3] %>"><%= user[1]+user[2]+" <"+user[0]+">" %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleInputFile">File input</label>
+              <div class="input-group">
+                <div class="custom-file">
+                  <input type="file" name=attachments[] class="custom-file-input" id = "attachments" multiple onChange="javascript:updateList();">
+                  <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                </div>
+            </div>
+            <p>Selected files:</p>
+            <div id="fileList"></div>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Content</label>
+            <textarea name="email_body"></textarea>
+          </div>
+      </div>
+      <div class="card-footer">
+        <button type="submit" class="btn btn-primary">Send</button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+</section>

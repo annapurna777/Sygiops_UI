@@ -1,0 +1,54 @@
+<section class="content">
+  <div class="container-fluid top-gapping">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Organization</h3>
+            <a href="/organizations/new" class="btn btn-primary float-right">Create New</a>
+          </div>
+          <div class="card-body">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Note</th>
+                  <th>Created at</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div id="organization">
+                <% @response.each do |organization| %>
+                <tr>
+                  <td><%=organization["name"]%></td>
+                  <td><%=organization["note"]%></td>
+                  <td><%=DateTime.parse(organization["created_at"]).strftime('%m/%d/%Y , %H:%M:%S %p')%>  (Created <%= time_ago_in_words(DateTime.parse(organization["created_at"])) %> ago)</td>
+                </tr>
+                <% end %>
+              </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_default_heading"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal_default_info">One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

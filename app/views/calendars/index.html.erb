@@ -1,0 +1,142 @@
+<%if !@response.blank?%>
+<% @response.each_with_index do |calendar , index| %>
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><%= calendar["name"]%></h3>
+        <%if index == 0%>
+        <a href="/calendars/new" class="btn btn-primary float-right">Create New</a>
+        <%end%>
+      </div>
+      <div class="card-body">
+        <div class="row">
+
+          <div class="col-md-6">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>BUSINESS HOURS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>MONDAY</td>
+                  <%if calendar["business_hours"]["mon"]["active"] == "true"%>
+                  <%calendar["business_hours"]["mon"]["timeframes"].each do |duration|%>
+                  <td><%=duration[0]%> - <%=duration[1]%></td>
+                  <%end%>
+                  <%else%>
+                  <td>---</td>
+                  <%end%>
+                </tr>
+                <tr>
+                  <td>TUESDAY</td>
+                  <%if calendar["business_hours"]["tue"]["active"] == "true"%>
+                  <%calendar["business_hours"]["tue"]["timeframes"].each do |duration|%>
+                  <td><%=duration[0]%> - <%=duration[1]%></td>
+                  <%end%>
+                  <%else%>
+                  <td>---</td>
+                  <%end%>
+                </tr>
+                <tr>
+                  <td>WEDNESDAY</td>
+                  <%if calendar["business_hours"]["wed"]["active"] == "true"%>
+                  <%calendar["business_hours"]["wed"]["timeframes"].each do |duration|%>
+                  <td><%=duration[0]%> - <%=duration[1]%></td>
+                  <%end%>
+                  <%else%>
+                  <td>---</td>
+                  <%end%>
+                </tr>
+                <tr>
+                  <td>THURSDAY</td>
+                  <%if calendar["business_hours"]["thu"]["active"] == "true"%>
+                  <%calendar["business_hours"]["thu"]["timeframes"].each do |duration|%>
+                  <td><%=duration[0]%> - <%=duration[1]%></td>
+                  <%end%>
+                  <%else%>
+                  <td>---</td>
+                  <%end%>
+                </tr>
+                <tr>
+                  <td>FRIDAY</td>
+                  <%if calendar["business_hours"]["fri"]["active"] == "true"%>
+                  <%calendar["business_hours"]["fri"]["timeframes"].each do |duration|%>
+                  <td><%=duration[0]%> - <%=duration[1]%></td>
+                  <%end%>
+                  <%else%>
+                  <td>---</td>
+                  <%end%>
+                </tr>
+                <tr>
+                  <td>SATURDAY</td>
+                  <%if calendar["business_hours"]["sat"]["active"] == "true"%>
+                  <%calendar["business_hours"]["sat"]["timeframes"].each do |duration|%>
+                  <td><%=duration[0]%> - <%=duration[1]%></td>
+                  <%end%>
+                  <%else%>
+                  <td>---</td>
+                  <%end%>
+                </tr>
+                <tr>
+                  <td>SUNDAY</td>
+                  <%if calendar["business_hours"]["sun"]["active"] == "true"%>
+                  <%calendar["business_hours"]["sun"]["timeframes"].each do |duration|%>
+                  <td><%=duration[0]%> - <%=duration[1]%></td>
+                  <%end%>
+                  <%else%>
+                  <td>---</td>
+                  <%end%>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="vl-active"></div>
+          <div class="col-md-6">
+            <table class="table">
+              <thead>
+                <tr><th>HOLIDAYS</th></tr>
+                <tr>
+                  <th>Date</th>
+                  <th>Summary</th>
+                  <th>Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%calendar["public_holidays"].each_pair do |date,summary|%>
+                <tr>
+                  <td><%= date%></td>
+                  <td><%= summary["summary"]%></td>
+                  <td><%if summary["active"] == "true"%><i class="fa fa-check"></i><%else%><i class="fa fa-times"></i><%end%></td>
+                </tr>
+                <%end%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<% end %>
+<%else%>
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Calendars</h3>
+        <a href="/calendars/new" class="btn btn-primary float-right">Create New</a>
+      </div>
+    </div>
+  </div>
+</section>
+<%end%>
+
+<script>
+$(document).ready(function () {
+
+});
+
+</script>

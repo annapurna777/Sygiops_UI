@@ -1,0 +1,114 @@
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title" id="heading">Create Ticket Type</h3>
+          </div>
+          <% if params[:action] == "new" %>
+          <form role="form" action="javascript:void(0)" method="post" id="create_ticket_type">
+            <%elsif params[:action] == "edit"%>
+            <form role="form" action="javascript:void(0)" method="post" id="edit_ticket_type">
+            <%end%>
+            <input id="authenticity_token" name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
+            <div class="card-body">
+              <div class="form-group">
+                <label for="exampleInputEmail1">Type Name</label>
+                <input type="text" name="name" class="form-control" placeholder="Enter name" id="name">
+              </div>
+              <div class="form-group">
+                <label for="exampleInputPassword1">Note</label>
+                <input type="text" name="note" class="form-control" placeholder="Enter note" id="note">
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modal_default_heading"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal_default_info">One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function () {
+  <%if params[:action] == "edit"%>
+  $("#name").val("<%= @name%>");
+  $("#note").val("<%= @note%>");
+  $("#heading").text("Edit Ticket Type");
+  <%end%>
+  $('#create_ticket_type').submit(function (event) {
+    if($("#name").val() == ""){
+      alert("Please enter type name!");
+      return;
+    }
+    $('#cover-spin').show();
+    $.ajax({
+      url: '/ticket_types',
+      method: 'POST',
+      data: $("#create_ticket_type").serialize(),
+      success: function (s) {
+        $('#cover-spin').hide();
+        if (s.result == "ok") {
+          window.location.href = "/ticket_types";
+        }
+         else {
+           document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+           $('#modal-default').modal('show');
+        }
+      },
+      error: function (e) {
+        $('#cover-spin').hide();
+        document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+        $('#modal-default').modal('show');
+      }
+    });
+  });
+
+  $('#edit_ticket_type').submit(function (event) {
+    $('#cover-spin').show();
+    $.ajax({
+      url: '/ticket_types/<%=@id%>',
+      method: 'PATCH',
+      data: $("#edit_ticket_type").serialize(),
+      success: function (s) {
+        // debugger;
+        $('#cover-spin').hide();
+        if (s.result == "ok") {
+          window.location.href = "/ticket_types";
+        }
+         else {
+           document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+           $('#modal-default').modal('show');
+        }
+      },
+      error: function (e) {
+        $('#cover-spin').hide();
+        document.getElementById("modal_default_info").innerHTML = "Some error occured , please try again!";
+        $('#modal-default').modal('show');
+      }
+    });
+  });
+
+});
+</script>
